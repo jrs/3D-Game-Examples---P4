@@ -4,22 +4,36 @@ using UnityEngine;
 
 public class JumpingWithJohn : MonoBehaviour
 {
-    public float turnSpeed = 20f;
-    public float moveSpeed = 10f;
+    public float turnSpeed = 20;
+    public float moveSpeed = 1f;
     public float JumpForce = 10f;
     public float GravityModifier = 1f;
     public bool IsOnGround = true;
     private Vector3 _movement;
-    //private Animator m_Animator;
+    //private Animator _animator;
     private Rigidbody _rigidbody;
     private Quaternion _rotation = Quaternion.identity;
+
+    //private Vector3 _defaultGravity = new Vector3(0f, -9.81f, 0f);
 
     // Start is called before the first frame update
     void Start()
     {
-        //m_Animator = GetComponent<Animator>();
+        //_animator = GetComponent<Animator>();
         _rigidbody = GetComponent<Rigidbody>();
+        //Physics.gravity = _defaultGravity;
+        //Debug.Log(Physics.gravity);
         Physics.gravity *= GravityModifier;
+        //Debug.Log(Physics.gravity);
+    }
+
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space) && IsOnGround)
+        {
+            _rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
+            IsOnGround = false;
+        }
     }
 
     // Update is called once per frame
@@ -34,20 +48,21 @@ public class JumpingWithJohn : MonoBehaviour
         bool hasHorizontalInput = !Mathf.Approximately (horizontal, 0f);
         bool hasVerticalInput = !Mathf.Approximately (vertical, 0f);
         bool isWalking = hasHorizontalInput || hasVerticalInput;
-        //m_Animator.SetBool ("IsWalking", isWalking);
+        //_animator.SetBool ("IsWalking", isWalking);
 
         Vector3 desiredForward = Vector3.RotateTowards (transform.forward, _movement, turnSpeed * Time.deltaTime, 0f);
         _rotation = Quaternion.LookRotation (desiredForward);
 
         _rigidbody.MovePosition (_rigidbody.position + _movement * moveSpeed * Time.deltaTime);
         _rigidbody.MoveRotation (_rotation);
-
-        if(Input.GetKeyDown(KeyCode.Space) && IsOnGround)
-        {
-            _rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
-            IsOnGround = false;
-        }
+    
     }
+
+    //void OnAnimatorMove ()
+    //{
+    //    _rigidbody.MovePosition (_rigidbody.position + _movement * m_Animator.deltaPosition.magnitude);
+    //    _rigidbody.MoveRotation (_rotation);
+    //}
 
     private void OnCollisionEnter(Collision collision)
     {
